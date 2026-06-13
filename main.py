@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Form
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-
+from fastapi.responses import FileResponse
 from database import bookings_collection
 
 app = FastAPI()
@@ -9,13 +8,13 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-# HOME PAGE
+# homepage
 @app.get("/")
 def home():
     return FileResponse("static/index.html")
 
 
-# BOOKING API
+# booking endpoint
 @app.post("/book")
 async def book(
     full_name: str = Form(...),
@@ -24,29 +23,24 @@ async def book(
     check_in: str = Form(...),
     check_out: str = Form(...),
     room_type: str = Form(...),
-    guests: int = Form(...)
+    guests: int = Form(...),
+    special_requests: str = Form("")
 ):
 
-    try:
-        booking = {
-            "full_name": full_name,
-            "email": email,
-            "phone": phone,
-            "check_in": check_in,
-            "check_out": check_out,
-            "room_type": room_type,
-            "guests": guests
-        }
+    booking = {
+        "full_name": full_name,
+        "email": email,
+        "phone": phone,
+        "check_in": check_in,
+        "check_out": check_out,
+        "room_type": room_type,
+        "guests": guests,
+        "special_requests": special_requests
+    }
 
-        result = await bookings_collection.insert_one(booking)
+    result = await bookings_collection.insert_one(booking)
 
-        return {"success": True, "id": str(result.inserted_id)}
-
-    except Exception as e:
-        return {"success": False, "error": str(e)}
-
-import os
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+    return {
+        "success": True,
+        "booking_id": str(result.inserted_id)
+    }

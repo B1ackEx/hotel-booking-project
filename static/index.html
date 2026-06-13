@@ -1,34 +1,46 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Hotel Booking</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
+from fastapi import FastAPI, Form
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from database import bookings_collection
 
-<div class="container">
-    <h1>Hotel Booking Form</h1>
+app = FastAPI()
 
-    <form action="/book" method="post">
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-        <input name="full_name" placeholder="Full Name" required>
-        <input name="email" placeholder="Email" required>
-        <input name="phone" placeholder="Phone" required>
 
-        <input type="date" name="check_in" required>
-        <input type="date" name="check_out" required>
+# homepage
+@app.get("/")
+def home():
+    return FileResponse("static/index.html")
 
-        <select name="room_type">
-            <option>Single</option>
-            <option>Double</option>
-            <option>Luxury</option>
-        </select>
 
-        <input type="number" name="guests" placeholder="Guests" required>
+# booking endpoint
+@app.post("/book")
+async def book(
+    full_name: str = Form(...),
+    email: str = Form(...),
+    phone: str = Form(...),
+    check_in: str = Form(...),
+    check_out: str = Form(...),
+    room_type: str = Form(...),
+    guests: int = Form(...),
+    special_requests: str = Form("")
+):
 
-        <button type="submit">Book Now</button>
-    </form>
-</div>
+    booking = {
+        "full_name": full_name,
+        "email": email,
+        "phone": phone,
+        "check_in": check_in,
+        "check_out": check_out,
+        "room_type": room_type,
+        "guests": guests,
+        "special_requests": special_requests
+    }
 
-</body>
-</html>
+    result = await bookings_collection.insert_one(booking)
+
+    return {
+        "success": True,
+        "booking_id": str(result.inserted_id)
+    }
