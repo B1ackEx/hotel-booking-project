@@ -27,22 +27,23 @@ async def book(
     guests: int = Form(...)
 ):
 
-    booking = {
-        "full_name": full_name,
-        "email": email,
-        "phone": phone,
-        "check_in": check_in,
-        "check_out": check_out,
-        "room_type": room_type,
-        "guests": guests
-    }
+    try:
+        booking = {
+            "full_name": full_name,
+            "email": email,
+            "phone": phone,
+            "check_in": check_in,
+            "check_out": check_out,
+            "room_type": room_type,
+            "guests": guests
+        }
 
-    result = await bookings_collection.insert_one(booking)
+        result = await bookings_collection.insert_one(booking)
 
-    return {
-        "success": True,
-        "booking_id": str(result.inserted_id)
-    }
+        return {"success": True, "id": str(result.inserted_id)}
+
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 import os
 
