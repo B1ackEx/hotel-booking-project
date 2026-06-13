@@ -1,46 +1,99 @@
-from fastapi import FastAPI, Form
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-from database import bookings_collection
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LuxeStay Booking</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
 
-app = FastAPI()
+<body>
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+<div class="bg-glow"></div>
 
+<div class="container">
 
-# homepage
-@app.get("/")
-def home():
-    return FileResponse("static/index.html")
+    <div class="header">
+        <h1>🏨 LuxeStay</h1>
+        <p>Book your perfect stay in seconds</p>
+    </div>
 
+    <form id="bookingForm" class="form">
 
-# booking endpoint
-@app.post("/book")
-async def book(
-    full_name: str = Form(...),
-    email: str = Form(...),
-    phone: str = Form(...),
-    check_in: str = Form(...),
-    check_out: str = Form(...),
-    room_type: str = Form(...),
-    guests: int = Form(...),
-    special_requests: str = Form("")
-):
+        <div class="grid">
 
-    booking = {
-        "full_name": full_name,
-        "email": email,
-        "phone": phone,
-        "check_in": check_in,
-        "check_out": check_out,
-        "room_type": room_type,
-        "guests": guests,
-        "special_requests": special_requests
+            <input type="text" name="full_name" placeholder="Full Name" required>
+            <input type="email" name="email" placeholder="Email Address" required>
+
+            <input type="text" name="phone" placeholder="Phone Number" required>
+
+            <select name="room_type" required>
+                <option value="">Select Room Type</option>
+                <option>Standard Room</option>
+                <option>Deluxe Suite</option>
+                <option>Luxury Penthouse</option>
+            </select>
+
+            <input type="date" name="check_in" required>
+            <input type="date" name="check_out" required>
+
+            <input type="number" name="guests" placeholder="Guests" required>
+
+        </div>
+
+        <textarea name="special_requests" placeholder="Special Requests (optional)"></textarea>
+
+        <button type="submit" id="submitBtn">Confirm Booking ✨</button>
+
+    </form>
+
+</div>
+
+<!-- LOADING -->
+<div id="loading" class="loading hidden">
+    <div class="spinner"></div>
+    <p>Processing your booking...</p>
+</div>
+
+<!-- SUCCESS POPUP -->
+<div id="popup" class="popup hidden">
+    <div class="popup-box">
+        <h2>🎉 Booking Confirmed!</h2>
+        <p>Your reservation is saved successfully.</p>
+        <button onclick="closePopup()">OK</button>
+    </div>
+</div>
+
+<script>
+const form = document.getElementById("bookingForm");
+const loading = document.getElementById("loading");
+const popup = document.getElementById("popup");
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    loading.classList.remove("hidden");
+
+    const formData = new FormData(form);
+
+    const res = await fetch("/book", {
+        method: "POST",
+        body: formData
+    });
+
+    loading.classList.add("hidden");
+
+    if (res.ok) {
+        popup.classList.remove("hidden");
+        form.reset();
+    } else {
+        alert("Booking failed!");
     }
+});
 
-    result = await bookings_collection.insert_one(booking)
+function closePopup() {
+    popup.classList.add("hidden");
+}
+</script>
 
-    return {
-        "success": True,
-        "booking_id": str(result.inserted_id)
-    }
+</body>
+</html>
