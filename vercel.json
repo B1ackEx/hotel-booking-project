@@ -20,11 +20,19 @@ form.addEventListener("submit", async (e) => {
     loading.classList.add("hidden");
 
     if (data.success) {
-        popup.classList.remove("hidden");
-        form.reset();
-    } else {
-        alert("Booking failed!");
-    }
+    popup.classList.remove("hidden");
+
+    popup.querySelector("h2").innerText = "🎉 Booking Confirmed!";
+    popup.querySelector("p").innerText =
+        "Booking ID: " + data.booking_id;
+
+    form.reset();
+} else {
+    popup.classList.remove("hidden");
+
+    popup.querySelector("h2").innerText = "❌ Booking Failed";
+    popup.querySelector("p").innerText =
+        "Error: " + data.error;
 });
 
 function closePopup() {

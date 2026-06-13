@@ -142,12 +142,13 @@ button:hover {
 }
 
 .popup-box {
-    background: white;
-    color: black;
-    padding: 25px;
-    border-radius: 15px;
+    background: linear-gradient(135deg, #ffffff, #f1f5f9);
+    color: #0f172a;
+    padding: 30px;
+    border-radius: 18px;
     text-align: center;
-    animation: pop 0.3s ease;
+    animation: pop 0.25s ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 
 .popup-box button {
