@@ -1,15 +1,33 @@
-{
-  "version": 2,
-  "builds": [
-    {
-      "src": "main.py",
-      "use": "@vercel/python"
+<script>
+const form = document.getElementById("bookingForm");
+const loading = document.getElementById("loading");
+const popup = document.getElementById("popup");
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    loading.classList.remove("hidden");
+
+    const formData = new FormData(form);
+
+    const res = await fetch("/book", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await res.json();
+
+    loading.classList.add("hidden");
+
+    if (data.success) {
+        popup.classList.remove("hidden");
+        form.reset();
+    } else {
+        alert("Booking failed!");
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "main.py"
-    }
-  ]
+});
+
+function closePopup() {
+    popup.classList.add("hidden");
 }
+</script>
