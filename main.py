@@ -40,7 +40,7 @@ async def book(
     result = await bookings_collection.insert_one(booking)
 
     return {
-        "message": "Booking Successful",
+        "success": True,
         "booking_id": str(result.inserted_id)
     }
 
